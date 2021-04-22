@@ -45,7 +45,7 @@
       }
       
       function display(time){
-        m = (time * (1/240))*1000;
+        m = (time * (1/60))*1000;
         m = m.toFixed(3);
         b = "Perfect!";
         streak++
@@ -77,5 +77,6 @@
 <body onload="init()">
   <h1>Jellyport Practice</h1>
   <canvas id="frameperfect" width="400" height="400" style="border:1px solid #FFFFFF;"></canvas>
+  <p> Just press J (Whip) and then U (Door) really fast in succession, and try to get the timing down. You may need to click the webpage before it accepts your inputs.</p>
 </body>
 </html>
