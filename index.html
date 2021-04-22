@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jellyport Practice</title>
+    
+    <style>
+      body {
+        background-color: #111111;
+        color: white;
+      }
+    </style>
+    
+    <script>
+      function init(){
+        x = 0;
+        going = false;
+        timer = 0;
+        streak = 0;
+        high = 0;
+        
+        document.addEventListener('keydown', function(event) {
+          if(event.keyCode == 74) {
+            timer = 1;
+            going = true;
+          }
+          else if(event.keyCode == 85) {
+            if (going){
+              going = false;
+              display(timer);
+              timer = 0;
+            }
+          }
+        });
+      
+        ctx = document.getElementById("frameperfect").getContext("2d");
+        ctx.fillStyle = "white";
+        ctx.font = "30px Arial";
+        
+        setInterval(function(){
+            if (going){
+              timer--;
+            }
+        }, (1000/60));
+      }
+      
+      function display(time){
+        m = (time * (1/240))*1000;
+        m = m.toFixed(3);
+        b = "Perfect!";
+        streak++
+        if (m > 0){
+          b = "Too early!";
+          streak = 0;
+
+        }
+        if (m < 0){
+          b = "Too late!";
+          streak = 0;
+        }
+        g = "Streak of "+streak+".";
+        m = Math.abs(m);
+        m = m + "ms"
+        if (streak > high){
+          high = streak;
+        }
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.fillText(b, 80, 190);
+        ctx.fillText(m, 80, 150);
+        ctx.fillText("High Score: " + high, 140, 340);
+        if (streak > 1){
+          ctx.fillText(g, 80, 230);
+        }
+      }
+    </script>
+</head>
+<body onload="init()">
+  <h1>Jellyport Practice</h1>
+  <canvas id="frameperfect" width="400" height="400" style="border:1px solid #FFFFFF;"></canvas>
+</body>
+</html>
