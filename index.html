@@ -45,6 +45,9 @@
         whip = 0;
         door = 0;
         
+        tries = 0;
+        successes = 0;
+        
         controlsInitialized = false;
         
         document.addEventListener('keydown', function(event) {
@@ -103,13 +106,17 @@
       function display(time){
         delay = (time * (1/60))*1000;
         response = "Perfect!";
-        streak++
+        tries++;
+        successes++
+        streak++;
         r = 37;
         g = 240;
         b = 69;
+        
         if (delay > 0){
           response = "Too early!";
           streak = 0;
+          successes--;
           r = 230;
           g = 220;
           b = 34;
@@ -118,6 +125,7 @@
         if (delay < 0){
           response = "Too late!";
           streak = 0;
+          successes--;
           r = 245; 
           g = 90; 
           b = 66;
@@ -173,11 +181,14 @@
         if (streak > 1){
           ctx.fillText(streak + " streak.", centerx, centery + 80);
         }
+        
+        ctx.textAlign = "left";
+        ctx.fillText(((successes/tries)*100).toFixed(2)+"% of "+tries, 4, canvas.height-6)
       }
       
       function funkyColor(){
         colorChanged = false;
-        for (i=1; i < 7; i++){
+        for (i=1; i < 5; i++){
           if (r < red){
             colorChanged = true;
             red--;
