@@ -5,78 +5,211 @@
     <title>Jellyport Practice</title>
     
     <style>
+      * {
+        margin: 0;
+      }
       body {
-        background-color: #111111;
+        background-color: rgb(17, 17, 17);
         color: white;
+      }
+      canvas {
+        padding: 0;
       }
     </style>
     
     <script>
       function init(){
+        canvas = document.getElementById("frameperfect");
+        ctx = canvas.getContext("2d");
+        
+        screenwidth = window.innerWidth;
+        screenheight = window.innerHeight;
+        
+        canvas.width = screenwidth;
+        canvas.height = screenheight;
+        
+        red = 17;
+        green = 17;
+        blue = 17;
+        
+        r = 17;
+        g = 17;
+        b = 17;
+        
         x = 0;
-        going = false;
+        timeRunning = false;
         timer = 0;
         streak = 0;
         high = 0;
         
+        whip = 0;
+        door = 0;
+        
+        controlsInitialized = false;
+        
         document.addEventListener('keydown', function(event) {
-          if(event.keyCode == 74) {
-            timer = 1;
-            going = true;
-          }
-          else if(event.keyCode == 85) {
-            if (going){
-              going = false;
-              display(timer);
-              timer = 0;
+          
+          var keypress = event.keyCode
+          if (controlsInitialized){
+            if(event.keyCode == whip) {
+              timer = 1;
+              timeRunning = true;
+            }
+            else if(event.keyCode == door) {
+              if (timeRunning){
+                timeRunning = false;
+                display(timer);
+                timer = 0;
+              }
             }
           }
+          else {
+            if (whip == 0){
+              whip = event.keyCode;
+              drawInstruct();
+            }
+            else {
+              door = event.keyCode;
+              controlsInitialized = true;
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+          }
+          
         });
-      
-        ctx = document.getElementById("frameperfect").getContext("2d");
-        ctx.fillStyle = "white";
-        ctx.font = "30px Arial";
+        
+        drawInstruct();
         
         setInterval(function(){
-            if (going){
+            if (timeRunning){
               timer--;
             }
+            
+            screenwidth = window.innerWidth;
+            screenheight = window.innerHeight;
+            
+            if (canvas.height != screenheight || canvas.width != screenwidth){
+              canvas.width = screenwidth;
+              canvas.height = screenheight;
+              drawText();
+              if (controlsInitialized === false){
+                drawInstruct();
+              }
+            }
+            
+            funkyColor();
         }, (1000/60));
       }
       
       function display(time){
-        m = (time * (1/60))*1000;
-        m = m.toFixed(3);
-        b = "Perfect!";
+        delay = (time * (1/60))*1000;
+        response = "Perfect!";
         streak++
-        if (m > 0){
-          b = "Too early!";
+        r = 37;
+        g = 240;
+        b = 69;
+        if (delay > 0){
+          response = "Too early!";
           streak = 0;
+          r = 230;
+          g = 220;
+          b = 34;
 
         }
-        if (m < 0){
-          b = "Too late!";
+        if (delay < 0){
+          response = "Too late!";
           streak = 0;
+          r = 245; 
+          g = 90; 
+          b = 66;
         }
-        g = "Streak of "+streak+".";
-        m = Math.abs(m);
-        m = m + "ms"
+        delay = Math.abs(delay);
+        delay = delay.toFixed(2);
+        delay = delay + "ms"
+        
+        if (streak > 1){
+          r = 168; 
+          g = 52;
+          b = 235;
+        }
         if (streak > high){
           high = streak;
         }
-        ctx.clearRect(0, 0, 400, 400);
-        ctx.fillText(b, 80, 190);
-        ctx.fillText(m, 80, 150);
-        ctx.fillText("High Score: " + high, 140, 340);
+        
+        drawText();
+      }
+      function drawInstruct(){
+        centerx = canvas.width/2
+        centery = canvas.height/2
+        
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        ctx.font = "60px Arial";
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (whip == 0){
+          ctx.fillText("Press your whip button!", centerx, centery + 40);
+        }
+        else {
+          ctx.fillText("Press your door button!", centerx, centery + 40);
+        }
+      }
+      function drawText(){
+        centerx = canvas.width/2
+        centery = canvas.height/2
+        
+        ctx.fillStyle = "white";
+        ctx.textAlign = "center";
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = "60px Arial";
+        ctx.fillText(delay, centerx, centery);
+        
+        ctx.font = "30px Arial";
+        
+        ctx.fillText(response, centerx, centery + 40);
+        
+        ctx.fillText("High Score: " + high, centerx, centery + 160);
         if (streak > 1){
-          ctx.fillText(g, 80, 230);
+          ctx.fillText(streak + " streak.", centerx, centery + 80);
+        }
+      }
+      
+      function funkyColor(){
+        colorChanged = false;
+        for (i=1; i < 7; i++){
+          if (r < red){
+            colorChanged = true;
+            red--;
+          }
+          if (r > red){
+            colorChanged = true;
+            red++;
+          }
+          if (b < blue){
+            colorChanged = true;
+            blue--;
+          }
+          if (b > blue){
+            colorChanged = true;
+            blue++;
+          }
+          if (g < green){
+            colorChanged = true;
+            green--;
+          }
+          if (g > green){
+            colorChanged = true;
+            green++;
+          }
+        }
+        if (colorChanged){
+          canvas.style = "background-color:rgb("+red+","+green+","+blue+");"
         }
       }
     </script>
 </head>
 <body onload="init()">
-  <h1>Jellyport Practice</h1>
-  <canvas id="frameperfect" width="400" height="400" style="border:1px solid #FFFFFF;"></canvas>
-  <p> Just press J (Whip) and then U (Door) really fast in succession, and try to get the timing down. You may need to click the webpage before it accepts your inputs.</p>
+  <canvas id="frameperfect" width="400" height="400"></canvas>
 </body>
 </html>
