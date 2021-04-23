@@ -22,11 +22,48 @@
         canvas = document.getElementById("frameperfect");
         ctx = canvas.getContext("2d");
         
+        nukem = document.getElementById("duke");
+        successquotes = [
+          "Holy cow.", 
+          "Holy shit.", 
+          "Groovy!", 
+          "Damn, I'm good!", 
+          "Lucky son of a bitch.", 
+          "Now this is a force to be reckoned with!",
+          "Sometimes I even amaze myself",
+          "Woo-hoo!",
+          "Yeah, piece of cake!",
+          "That's gonna leave a mark!",
+          "The fifth element is always Duke!",
+          "They don't make 'em better than me!",
+          "I'm gonna run for president.",
+          "Ooh, I needed that!",
+          "Let's rock!",
+          "Aahhh... much better. (upon urinating)",
+          "Always bet on Duke.",
+          "I hate to kick my own ass, but it's gotta be done."]
+        failurequotes = [
+          "Damn...", 
+          "Damn!", 
+          "Damn it.", 
+          "Eat shit and die.",
+          "Shit happens.",
+          "This really pisses me off!",
+          "Ugh, this sucks.",
+          "You're pissing me off!",
+          "So help me Duke.",
+          "I'm getting too old for this shit.",
+          "Take a bite of Duke's special pain cake!",
+          "Pork chop sandwiches.",
+          "What a mess!"] 
         screenwidth = window.innerWidth;
         screenheight = window.innerHeight;
         
         canvas.width = screenwidth;
         canvas.height = screenheight;
+        
+        k = 0;
+        sequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
         
         red = 17;
         green = 17;
@@ -37,16 +74,21 @@
         b = 17;
         
         x = 0;
+        font = "Arial";
         timeRunning = false;
         timer = 0;
         streak = 0;
         high = 0;
+        
+        duke = false;
         
         whip = 0;
         door = 0;
         
         tries = 0;
         successes = 0;
+        late = 0;
+        early = 0;
         
         controlsInitialized = false;
         
@@ -54,6 +96,7 @@
           
           var keypress = event.keyCode
           if (controlsInitialized){
+            konami(event.keyCode);
             if(event.keyCode == whip) {
               timer = 1;
               timeRunning = true;
@@ -75,12 +118,30 @@
               door = event.keyCode;
               controlsInitialized = true;
               ctx.clearRect(0, 0, canvas.width, canvas.height);
+              drawInstruct();
             }
           }
           
         });
         
         drawInstruct();
+        
+        function konami(key){
+          if (key == sequence[k] && !duke){
+            k++;
+          }
+          else {
+            k = 0;
+          }
+          
+          if (k > 9){
+            font = "Comic Sans MS";
+            duke = true;
+            drawText();
+          }
+        }
+        
+        
         
         setInterval(function(){
             if (timeRunning){
@@ -94,7 +155,7 @@
               canvas.width = screenwidth;
               canvas.height = screenheight;
               drawText();
-              if (controlsInitialized === false){
+              if (tries === 0){
                 drawInstruct();
               }
             }
@@ -106,6 +167,9 @@
       function display(time){
         delay = (time * (1/60))*1000;
         response = "Perfect!";
+        if (duke){
+          response = successquotes[Math.floor(Math.random() * successquotes.length)];
+        }
         tries++;
         successes++
         streak++;
@@ -116,19 +180,27 @@
         if (delay > 0){
           response = "Too early!";
           streak = 0;
+          early++;
           successes--;
           r = 230;
           g = 220;
           b = 34;
+          if (duke){
+            response = failurequotes[Math.floor(Math.random() * failurequotes.length)];
+          }
 
         }
         if (delay < 0){
           response = "Too late!";
           streak = 0;
+          late++;
           successes--;
           r = 245; 
           g = 90; 
           b = 66;
+          if (duke){
+            response = failurequotes[Math.floor(Math.random() * failurequotes.length)];
+          }
         }
         delay = Math.abs(delay);
         delay = delay.toFixed(2);
@@ -151,15 +223,18 @@
         
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
-        ctx.font = "60px Arial";
+        ctx.font = "60px "+font;
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         if (whip == 0){
           ctx.fillText("Press your whip button!", centerx, centery + 40);
         }
-        else {
+        else if (door == 0){
           ctx.fillText("Press your door button!", centerx, centery + 40);
+        }
+        else {
+          ctx.fillText("Now, press whip and then door!", centerx, centery + 40);
         }
       }
       function drawText(){
@@ -170,10 +245,10 @@
         ctx.textAlign = "center";
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.font = "60px Arial";
+        ctx.font = "60px "+font;
         ctx.fillText(delay, centerx, centery);
         
-        ctx.font = "30px Arial";
+        ctx.font = "30px "+font;
         
         ctx.fillText(response, centerx, centery + 40);
         
@@ -183,7 +258,16 @@
         }
         
         ctx.textAlign = "left";
-        ctx.fillText(((successes/tries)*100).toFixed(2)+"% of "+tries, 4, canvas.height-6)
+        ctx.fillText(((successes/tries)*100).toFixed(2)+"% of "+tries, 4, canvas.height-6);
+        
+        ctx.font = "20px " + font;
+        ctx.fillText(((late/tries)*100).toFixed(2)+"% Late", 4, canvas.height-33);
+        ctx.fillText(((early/tries)*100).toFixed(2)+"% Early", 4, canvas.height-53);
+        
+        if (duke){
+          ctx.drawImage(nukem, canvas.width - 220, canvas.height - 320);
+        }
+        
       }
       
       function funkyColor(){
@@ -222,5 +306,6 @@
 </head>
 <body onload="init()">
   <canvas id="frameperfect" width="400" height="400"></canvas>
+  <img src="https://upload.wikimedia.org/wikipedia/en/thumb/e/e5/Duke_Nukem.png/220px-Duke_Nukem.png" style="display:none;" id="duke">
 </body>
 </html>
