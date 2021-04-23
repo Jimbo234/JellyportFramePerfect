@@ -7,6 +7,7 @@
     <style>
       * {
         margin: 0;
+        overflow: hidden;
       }
       body {
         background-color: rgb(17, 17, 17);
@@ -119,10 +120,12 @@
               drawInstruct();
             }
             else {
-              door = event.keyCode;
-              controlsInitialized = true;
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              drawInstruct();
+              if (event.keyCode != whip){
+                door = event.keyCode;
+                controlsInitialized = true;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawInstruct();
+              }
             }
           }
           
@@ -156,13 +159,15 @@
             
             screenwidth = window.innerWidth;
             screenheight = window.innerHeight;
-            
             if (canvas.height != screenheight || canvas.width != screenwidth){
               canvas.width = screenwidth;
               canvas.height = screenheight;
-              drawText();
+              
               if (tries === 0){
                 drawInstruct();
+              }
+              else {
+                drawText();
               }
             }
             
